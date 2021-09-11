@@ -170,6 +170,7 @@ fun ImageView.loadImage(
     //进度监听,请求回调监听
     onProgressListener: OnProgressListener = null,
     requestListener: (OnImageListener.() -> Unit)? = null,
+    isPlaceHolderUseTransition: Boolean = DEFAULT.isPlaceHolderUseTransition
 ) {
     val options = ImageOptions().also {
         it.res = load
@@ -205,6 +206,7 @@ fun ImageView.loadImage(
         it.transformation = transformation
         it.progressListener(onProgressListener)
         requestListener?.let { l -> it.requestListener(l) }
+        it.isPlaceHolderUseTransition = isPlaceHolderUseTransition
     }
     GlideImageLoader.loadImage(options)
 }

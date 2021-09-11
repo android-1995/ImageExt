@@ -177,6 +177,13 @@ class ImageOptions {
         requestListener = OnImageListener().also(listener)
     }
 
+    var isPlaceHolderUseTransition: Boolean = false
+        get() = TODO()
+        set(value) {
+            setDrawableOptions { isPlaceHolderUseTransition = value }
+            field = value
+        }
+
     data class DrawableOptions(
         /*** 加载占位图资源ID，如果placeholder是0表示没有占位图*/
         @DrawableRes var placeHolderResId: Int = 0, var placeHolderDrawable: Drawable? = null,
@@ -185,6 +192,8 @@ class ImageOptions {
         /** DES: fallback */
         @DrawableRes
         var fallbackResId: Int = 0, var fallbackDrawable: Drawable? = null,
+        /*** 占位图是否也使用transition*/
+        var isPlaceHolderUseTransition: Boolean = false,
     ) {
         companion object {
             var DEFAULT = DrawableOptions()

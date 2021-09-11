@@ -1,5 +1,6 @@
 package com.github.forjrking.image.glide
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
@@ -33,6 +34,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.net.URL
 
+@SuppressLint("CheckResult")
 /**Glide封装*/
 object GlideImageLoader {
 
@@ -91,8 +93,14 @@ object GlideImageLoader {
             //设置占位符
             if (drawableOptions.placeHolderDrawable != null) {
                 placeholder(drawableOptions.placeHolderDrawable)
+                if (options.thumbnail <= 0f && options.thumbnailUrl == null) {
+                    thumbnail(getThumbnailRequest(drawableOptions.placeHolderDrawable!!, options))
+                }
             } else if (drawableOptions.placeHolderResId != 0) {
                 placeholder(drawableOptions.placeHolderResId)
+                if (options.thumbnail <= 0f && options.thumbnailUrl == null) {
+                    thumbnail(getThumbnailRequest(drawableOptions.placeHolderResId, options))
+                }
             }
             //设置错误的图片
             if (drawableOptions.errorDrawable != null) {
@@ -138,8 +146,12 @@ object GlideImageLoader {
 
             if (options.isCircle || options.borderWidth > 0) {
                 if (options.isCircle) {
-                    transform(CircleWithBorderTransformation(options.borderWidth,
-                        options.borderColor))
+                    transform(
+                        CircleWithBorderTransformation(
+                            options.borderWidth,
+                            options.borderColor
+                        )
+                    )
                 } else {
                     transform(BorderTransformation(options.borderWidth, options.borderColor))
                 }
@@ -158,19 +170,29 @@ object GlideImageLoader {
                     transformation = CenterCrop()
                 }
                 if (transformation == null) {
-                    transform(RoundedCornersTransformation(options.roundRadius,
-                        0,
-                        options.cornerType))
+                    transform(
+                        RoundedCornersTransformation(
+                            options.roundRadius,
+                            0,
+                            options.cornerType
+                        )
+                    )
                 } else {
-                    transform(transformation,
-                        RoundedCornersTransformation(options.roundRadius, 0, options.cornerType))
+                    transform(
+                        transformation,
+                        RoundedCornersTransformation(options.roundRadius, 0, options.cornerType)
+                    )
                 }
             }
 
             if (options.isBlur) {
-                transform(BlurTransformation(options.imageView!!.context,
-                    options.blurRadius,
-                    options.blurSampling))
+                transform(
+                    BlurTransformation(
+                        options.imageView!!.context,
+                        options.blurRadius,
+                        options.blurSampling
+                    )
+                )
             }
 
             if (options.isGray) {
@@ -214,6 +236,73 @@ object GlideImageLoader {
             ProgressManager.addListener(options.res.toString(), options.onProgressListener)
         }
 
+    }
+
+    private fun getThumbnailRequest(src: Any, options: ImageOptions): GlideRequest<Drawable> {
+        return glideRequests(options.context).load(src)
+            .apply {
+                if (options.isPlaceHolderUseTransition) {
+                    return@apply
+                }
+                if (options.isCircle || options.borderWidth > 0) {
+                    if (options.isCircle) {
+                        transform(
+                            CircleWithBorderTransformation(
+                                options.borderWidth,
+                                options.borderColor
+                            )
+                        )
+                    } else {
+                        transform(BorderTransformation(options.borderWidth, options.borderColor))
+                    }
+                }
+
+                // 是否设置圆角特效
+                if (options.isRoundedCorners) {
+                    var transformation: BitmapTransformation? = null
+                    // 圆角特效受到ImageView的scaleType属性影响
+                    val scaleType = options.imageView?.scaleType
+                    if (scaleType == ImageView.ScaleType.FIT_CENTER ||
+                        scaleType == ImageView.ScaleType.CENTER_INSIDE ||
+                        scaleType == ImageView.ScaleType.CENTER ||
+                        scaleType == ImageView.ScaleType.CENTER_CROP
+                    ) {
+                        transformation = CenterCrop()
+                    }
+                    if (transformation == null) {
+                        transform(
+                            RoundedCornersTransformation(
+                                options.roundRadius,
+                                0,
+                                options.cornerType
+                            )
+                        )
+                    } else {
+                        transform(
+                            transformation,
+                            RoundedCornersTransformation(options.roundRadius, 0, options.cornerType)
+                        )
+                    }
+                }
+
+                if (options.isBlur) {
+                    transform(
+                        BlurTransformation(
+                            options.imageView!!.context,
+                            options.blurRadius,
+                            options.blurSampling
+                        )
+                    )
+                }
+
+                if (options.isGray) {
+                    transform(GrayscaleTransformation())
+                }
+
+                options.transformation?.let {
+                    transform(*options.transformation!!)
+                }
+            }
     }
 
     private fun glideRequests(context: Any?): GlideRequests {
@@ -279,10 +368,12 @@ object GlideImageLoader {
             file.copyTo(targetFile)
             //扫描媒体库
             val mimeTypes = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
-            MediaScannerConnection.scanFile(context,
+            MediaScannerConnection.scanFile(
+                context,
                 arrayOf(targetFile.absolutePath),
                 arrayOf(mimeTypes),
-                null)
+                null
+            )
             targetFile
         }
 
