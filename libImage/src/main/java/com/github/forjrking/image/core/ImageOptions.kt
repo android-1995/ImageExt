@@ -178,7 +178,6 @@ class ImageOptions {
     }
 
     var isPlaceHolderUseTransition: Boolean = false
-        get() = TODO()
         set(value) {
             setDrawableOptions { isPlaceHolderUseTransition = value }
             field = value

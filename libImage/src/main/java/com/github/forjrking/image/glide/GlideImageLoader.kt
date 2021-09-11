@@ -241,7 +241,7 @@ object GlideImageLoader {
     private fun getThumbnailRequest(src: Any, options: ImageOptions): GlideRequest<Drawable> {
         return glideRequests(options.context).load(src)
             .apply {
-                if (options.isPlaceHolderUseTransition) {
+                if (!options.isPlaceHolderUseTransition) {
                     return@apply
                 }
                 if (options.isCircle || options.borderWidth > 0) {
