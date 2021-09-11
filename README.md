@@ -25,7 +25,7 @@
    ImageOptions.DrawableOptions.setDefault {
        placeHolderResId =  R.drawable.ic_launcher_background
        errorResId = R.color.gray
-       isPlaceHolderUseTransition = true //(true,erro和fallback都会失效)
+       isPlaceHolderUseTransition = true //(true,error和fallback都会失效)
    }
    // URL
    imageView.load("https://www.example.com/image.jpg")
@@ -103,7 +103,7 @@
 | `vararg transformation: Transformation<Bitmap>`              | 转换器，支持圆角、黑白等和其他自定义                         |
 | `onProgressListener: OnProgressListener? = null`             | 网络资源进度监听，仅网络资源有效                             |
 | `requestListener: OnImageListener?`                          | 加载结果监听,成功和失败                                      |
-| `isPlaceHolderUseTransition: Boolean=false?`                 | 占位图是否也使用transition(true,erro和fallback都会失效)                                      |
+| `isPlaceHolderUseTransition: Boolean=false?`                 | 占位图是否也使用transition(true,error和fallback都会失效)                                      |
 
 ## 封装实现
 
