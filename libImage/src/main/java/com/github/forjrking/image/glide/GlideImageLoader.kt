@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.DecodeFormat
+import com.bumptech.glide.load.Transformation
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation
@@ -244,22 +245,21 @@ object GlideImageLoader {
                 if (!options.isPlaceHolderUseTransition) {
                     return@apply
                 }
+                val transformations = arrayListOf<Transformation<Bitmap>>()
                 if (options.isCircle || options.borderWidth > 0) {
-                    if (options.isCircle) {
-                        transform(
+                    transformations.add(
+                        if (options.isCircle) {
                             CircleWithBorderTransformation(
                                 options.borderWidth,
                                 options.borderColor
                             )
-                        )
-                    } else {
-                        transform(BorderTransformation(options.borderWidth, options.borderColor))
-                    }
+                        } else {
+                            BorderTransformation(options.borderWidth, options.borderColor)
+                        }
+                    )
                 }
-
                 // 是否设置圆角特效
                 if (options.isRoundedCorners) {
-                    var transformation: BitmapTransformation? = null
                     // 圆角特效受到ImageView的scaleType属性影响
                     val scaleType = options.imageView?.scaleType
                     if (scaleType == ImageView.ScaleType.FIT_CENTER ||
@@ -267,26 +267,18 @@ object GlideImageLoader {
                         scaleType == ImageView.ScaleType.CENTER ||
                         scaleType == ImageView.ScaleType.CENTER_CROP
                     ) {
-                        transformation = CenterCrop()
+                        transformations.add(CenterCrop())
                     }
-                    if (transformation == null) {
-                        transform(
-                            RoundedCornersTransformation(
-                                options.roundRadius,
-                                0,
-                                options.cornerType
-                            )
+                    transformations.add(
+                        RoundedCornersTransformation(
+                            options.roundRadius,
+                            0,
+                            options.cornerType
                         )
-                    } else {
-                        transform(
-                            transformation,
-                            RoundedCornersTransformation(options.roundRadius, 0, options.cornerType)
-                        )
-                    }
+                    )
                 }
-
                 if (options.isBlur) {
-                    transform(
+                    transformations.add(
                         BlurTransformation(
                             options.imageView!!.context,
                             options.blurRadius,
@@ -294,13 +286,14 @@ object GlideImageLoader {
                         )
                     )
                 }
-
                 if (options.isGray) {
-                    transform(GrayscaleTransformation())
+                    transformations.add(GrayscaleTransformation())
                 }
-
                 options.transformation?.let {
-                    transform(*options.transformation!!)
+                    transformations.addAll(it)
+                }
+                if (transformations.isNotEmpty()) {
+                    transform(*transformations.toTypedArray())
                 }
             }
     }
