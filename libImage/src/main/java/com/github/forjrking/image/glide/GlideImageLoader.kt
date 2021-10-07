@@ -242,7 +242,7 @@ object GlideImageLoader {
     private fun getThumbnailRequest(src: Any, options: ImageOptions): GlideRequest<Drawable> {
         return glideRequests(options.context).load(src)
             .apply {
-                if (!options.isPlaceHolderUseTransition) {
+                if (!options.drawableOptions.isPlaceHolderUseTransition) {
                     return@apply
                 }
                 val transformations = arrayListOf<Transformation<Bitmap>>()

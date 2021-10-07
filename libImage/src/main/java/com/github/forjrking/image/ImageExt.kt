@@ -206,7 +206,7 @@ fun ImageView.loadImage(
         it.transformation = transformation
         it.progressListener(onProgressListener)
         requestListener?.let { l -> it.requestListener(l) }
-        it.isPlaceHolderUseTransition = isPlaceHolderUseTransition
+        it.isPlaceHolderUseTransition(isPlaceHolderUseTransition)
     }
     GlideImageLoader.loadImage(options)
 }
